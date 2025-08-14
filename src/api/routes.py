@@ -26,7 +26,7 @@ def register():
     password = data.get("password")
     name = data.get("name")
 
-    if not email or not pasword or not name:
+    if not email or not password or not name:
         raise APIException("Faltan campos obligatorios", status_code=400)
     
     if User.query.filter_by(email=email).first():

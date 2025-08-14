@@ -29,11 +29,11 @@ class Event(db.Model):
     __tablename__="events"
 
     id:Mapped[int] = mapped_column(Integer,primary_key=True)
-    sport: Mapped[str] = mapped_column(String(50), nullable=False),
-    datetime: Mapped[DateTime] = mapped_column(DateTime, nullable=False),
-    lat: Mapped[float] = mapped_column(Float, nullable=False),
-    lng: Mapped[float] = mapped_column(Float, nullable=False),
-    capacity: Mapped[int] = mapped_column(Integer, nullable=False),
+    sport: Mapped[str] = mapped_column(String(50), nullable=False)
+    datetime: Mapped[DateTime] = mapped_column(DateTime, nullable=False)
+    lat: Mapped[float] = mapped_column(Float, nullable=False)
+    lng: Mapped[float] = mapped_column(Float, nullable=False)
+    capacity: Mapped[int] = mapped_column(Integer, nullable=False)
     price: Mapped[int] = mapped_column(Integer, default=0)
     is_free: Mapped[bool] = mapped_column(Boolean, default=True)
     players: Mapped[list["EventPlayer"]] = relationship("EventPlayer", back_populates="event", cascade="all, delete-orphan")
@@ -54,7 +54,7 @@ class EventPlayer(db.Model):
     __tablename__= "event_players"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    useer_id: Mapped[int] =mapped_column(Integer, ForeignKey("events.id"), nullable=False)
+    user_id: Mapped[int] =mapped_column(Integer, ForeignKey("users.id"), nullable=False)
     event_id: Mapped[int] =mapped_column(Integer, ForeignKey("events.id"), nullable=False)
     paid: Mapped[bool] =mapped_column(Boolean, default=False)
     material: Mapped[str | None] = mapped_column(String(200), nullable=True)

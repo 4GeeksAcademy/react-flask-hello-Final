@@ -23,17 +23,17 @@ CORS(api)
 def register():
     data = request.get_json() or {}
     email = data.get("email")
-    pasword = data.get("pasword")
+    password = data.get("password")
     name = data.get("name")
 
     if not email or not pasword or not name:
         raise APIException("Faltan campos obligatorios", status_code=400)
     
-    if User.query.filter.by(email=email).first():
+    if User.query.filter_by(email=email).first():
         raise APIException("Email ya registrado", status_code=409)
     
     pw_hash = generate_password_hash(pasword)
-    user = User(email=email, pasword_hash=pw_hash, name=name)
+    user = User(email=email, password_hash=pw_hash, name=name)
     db.session.add(user)
     db.session.commit()
 
@@ -42,11 +42,11 @@ def register():
 @api.route('/auth/login', methods=['POST'])
 def login():
 
-    data = request.get.json() or {}
+    data = request.get_json() or {}
     email = data.get("email")
     password = data.get("password")
 
-    user = user.query.filter_by(email=email).first()
+    user = User.query.filter_by(email=email).first()
     if not user or not check_password_hash(user.password_hash, password):
         raise APIException("credenciales inválidas", status_code=401)
     
@@ -62,7 +62,7 @@ def get_profile():
         raise APIException("Usuario no encontrado", status_code=404)
     return jsonify(user.serialize()), 200
 
-@api.route('/users/me',mehods=['PUT'])
+@api.route('/users/me',methods=['PUT'])
 @jwt_required()
 def update_profile():
     user_id = get_jwt_identity()
@@ -77,9 +77,9 @@ def update_profile():
         user.level = data["level"]
 
     db.session.commit()
-    return jsonify({"Perfil actualizado"}), 200
+    return jsonify({"msg": "Perfil actualizado"}), 200
 
-@api.route('/users/me', methods=['delete'])
+@api.route('/users/me', methods=['DELETE'])
 @jwt_required()
 def delete_account():
     user_id = get_jwt_identity()
@@ -93,7 +93,7 @@ def delete_account():
 
 # CRUD de Eventos y endpoint de “unirse” a un evento
 
-@api.route('/events', methods=['Get'])
+@api.route('/events', methods=['GET'])
 def list_events():
     events = Event.query.all()
     return jsonify([e.serialize() for e in events]), 200
@@ -113,9 +113,15 @@ def create_event():
     if not all(field in data for field in required):
         raise APIException("Faltan campos obligatorios", status_code=400)
     
+    from datetime import datetime as _dt
+    try:
+        dt = _dt.fromisoformat(data["datetime"])
+    except Exception:
+        raise APIException("Formato de fecha/hora invalido (usa ISO 8601)", status_code=400)
+    
     event = Event(
         sport=data["sport"],
-        datetime=data["datetime"],
+        datetime=dt,
         lat=float(data["lat"]),
         lng=float(data["lng"]),
         capacity=int(data["capacity"]),
@@ -133,9 +139,9 @@ def update_event(event_id):
 
     event = Event.query.get(event_id)
     if not event:
-        raise APIException("Evento no encontrado", status=404)
+        raise APIException("Evento no encontrado", status_code=404)
     
-    data = request.get.json() or {}
+    data = request.get_json() or {}
     
     for field in ["sport", "datetime", "lat", "lng", "capacity", "price"]:
         if field in data:

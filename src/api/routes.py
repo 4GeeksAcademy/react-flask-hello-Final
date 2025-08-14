@@ -11,8 +11,7 @@ from flask_jwt_extended import (
     jwt_required,
     get_jwt_identity
 )
-from .models import Event, EventPlayer
-
+from .models import Event
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
@@ -31,8 +30,7 @@ def register():
     
     if User.query.filter_by(email=email).first():
         raise APIException("Email ya registrado", status_code=409)
-    
-    pw_hash = generate_password_hash(pasword)
+    pw_hash = generate_password_hash(password)
     user = User(email=email, password_hash=pw_hash, name=name)
     db.session.add(user)
     db.session.commit()
@@ -52,8 +50,7 @@ def login():
     
     token = create_access_token(identity=user.id)
     return jsonify({"access_token": token}), 200
-
-@api.route('/users/me',methods=['GET'])
+@api.route('/users/me', methods=['GET'])
 @jwt_required()
 def get_profile():
     user_id = get_jwt_identity()
@@ -61,12 +58,11 @@ def get_profile():
     if not user:
         raise APIException("Usuario no encontrado", status_code=404)
     return jsonify(user.serialize()), 200
-
-@api.route('/users/me',methods=['PUT'])
+@api.route('/users/me', methods=['PUT'])
 @jwt_required()
 def update_profile():
     user_id = get_jwt_identity()
-    data = request.get_json() or{}
+    data = request.get_json() or {}
     user = User.query.get(user_id)
     if not user:
         raise APIException("Usuario no encontrado", status_code=404)
@@ -117,8 +113,8 @@ def create_event():
     try:
         dt = _dt.fromisoformat(data["datetime"])
     except Exception:
-        raise APIException("Formato de fecha/hora invalido (usa ISO 8601)", status_code=400)
-    
+        raise APIException(
+            "Formato de fecha/hora invalido (usa ISO 8601)", status_code=400)
     event = Event(
         sport=data["sport"],
         datetime=dt,
@@ -142,17 +138,16 @@ def update_event(event_id):
         raise APIException("Evento no encontrado", status_code=404)
     
     data = request.get_json() or {}
-    
+
     for field in ["sport", "datetime", "lat", "lng", "capacity", "price"]:
         if field in data:
             setattr(event, field, type(getattr(event, field))(data[field]))
-            
+
         event.is_free = (event.price == 0)
 
         db.session.commit()
         return jsonify(event.serialize()), 200
-    
-@api.route('/events/<int:event_id>',methods=['DELETE'])
+@api.route('/events/<int:event_id>', methods=['DELETE'])
 @jwt_required()
 def delete_event(event_id):
 
@@ -164,6 +159,7 @@ def delete_event(event_id):
     db.session.commit()
     return jsonify({"msg": "Evento eliminado"}), 200
 
+"""
 @api.route('/events/<int:event_id>/join', methods=['POST'])
 @jwt_required()
 def join_event(event_id):
@@ -172,14 +168,13 @@ def join_event(event_id):
     event = Event.query.get(event_id)
     if not event:
         raise APIException("Evento no encontrado", status_code=404)
-    
-    if len(event.players) >=event.capacity:
+    if len(event.players) >= event.capacity:
         raise APIException("Evento lleno", status_code=400)
-    
-    exist = EventPlayer.query.filter_by(user_id=user_id, event_id=event_id).first()
+    exist = EventPlayer.query.filter_by(
+        user_id=user_id, event_id=event_id).first()
     if exist:
         raise APIException("Ya inscrito en este evento", status_code=409)
-    
+        
     inscription = EventPlayer(
         user_id=user_id,
         event_id=event_id,
@@ -188,3 +183,4 @@ def join_event(event_id):
     db.session.add(inscription)
     db.session.commit()
     return jsonify(inscription.serialize()), 201
+"""

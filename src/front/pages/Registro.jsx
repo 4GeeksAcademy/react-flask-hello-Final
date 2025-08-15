@@ -3,9 +3,7 @@ import {UNSAFE_ErrorResponseImpl, useNavigate} from "react-router-dom";
 
 export default function Register() {
     const navigate = useNavigate();
-}
-
-const [form, setForm] = useState({
+    const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
@@ -126,3 +124,6 @@ return (
       </form>
     </div>
   );
+
+}
+

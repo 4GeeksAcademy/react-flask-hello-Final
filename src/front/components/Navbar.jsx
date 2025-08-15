@@ -4,15 +4,28 @@ export const Navbar = () => {
 
 	return (
 		<nav className="navbar navbar-light bg-light">
-			<div className="container">
-				<Link to="/">
-					<span className="navbar-brand mb-0 h1">React Boilerplate</span>
+			<Link
+				to={"/"}
+			>
+				<h1 style={{ margin: 0 }}>Pick4Fun</h1>
+			</Link>
+
+			<div style={{ display: "flex", gap: 8 }}>
+				<Link
+					to={"/registro"}
+				>
+					Registrarse
 				</Link>
-				<div className="ml-auto">
-					<Link to="/demo">
-						<button className="btn btn-primary">Check the Context in action</button>
-					</Link>
-				</div>
+				<Link
+					to={"/login"}
+				>
+					Iniciar sesión
+				</Link>
+				<Link
+					to={"/events/new"}
+				>
+					Crear evento
+				</Link>
 			</div>
 		</nav>
 	);

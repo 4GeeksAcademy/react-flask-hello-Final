@@ -1,5 +1,6 @@
 import React, { useEffect, useState} from "react";
 import EventCard from "../components/EventCard";
+import Registro from "../pages/Registro"
 
 export default function Home() {
 	const BASE = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:5000";
@@ -63,7 +64,7 @@ return (
       <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
         <h1 style={{ margin: 0 }}>Pick4Fun</h1>
         <div style={{ display: "flex", gap: 8 }}>
-          <button onClick={() => window.location.assign("/register")}>Registrarse</button>
+          <button onClick={() => window.location.assign("/registro")}>Registrarse</button>
           <button onClick={() => window.location.assign("/login")}>Iniciar sesión</button>
           <button onClick={() => window.location.assign("/events/new")}>Crear evento</button>
         </div>

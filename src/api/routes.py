@@ -31,7 +31,7 @@ def register():
     if User.query.filter_by(email=email).first():
         raise APIException("Email ya registrado", status_code=409)
     pw_hash = generate_password_hash(password)
-    user = User(email=email, password_hash=pw_hash, name=name)
+    user = User(email=email, password_hash=pw_hash, name=name, is_active=True)
     db.session.add(user)
     db.session.commit()
 
@@ -174,7 +174,7 @@ def join_event(event_id):
         user_id=user_id, event_id=event_id).first()
     if exist:
         raise APIException("Ya inscrito en este evento", status_code=409)
-        
+
     inscription = EventPlayer(
         user_id=user_id,
         event_id=event_id,

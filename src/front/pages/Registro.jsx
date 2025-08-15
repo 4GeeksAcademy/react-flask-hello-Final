@@ -27,7 +27,7 @@ function validate(values) {
     const newErrors = { name: "", email: "", password: ""};
 
     if(!values.name.trim()) newErrors.name = "El nombre es obligatorio.";
-    else if (!values.name.trim().lenght < 2) newErrors.name = "Minimo 2 caracteres.";
+    else if (values.name.trim().lenght < 2) newErrors.name = "Minimo 2 caracteres.";
 
     if (!values.email.trim()) newErrors.email = "El email es obligatorio.";
     else if (!/^\S+@\S+\.\S+$/.test(values.email))

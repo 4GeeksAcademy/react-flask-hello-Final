@@ -11,6 +11,7 @@ from flask_jwt_extended import (
     jwt_required,
     get_jwt_identity
 )
+from datetime import datetime as _dt
 from .models import Event
 api = Blueprint('api', __name__)
 
@@ -102,19 +103,19 @@ def get_event(event_id):
     return jsonify(event.serialize()), 200
 
 @api.route('/events', methods=['POST'])
-@jwt_required()
+# @jwt_required()
 def create_event():
     data = request.get_json() or {}
     required = ["sport", "datetime", "lat", "lng", "capacity", "price"]
     if not all(field in data for field in required):
         raise APIException("Faltan campos obligatorios", status_code=400)
     
-    from datetime import datetime as _dt
     try:
         dt = _dt.fromisoformat(data["datetime"])
     except Exception:
         raise APIException(
             "Formato de fecha/hora invalido (usa ISO 8601)", status_code=400)
+    
     event = Event(
         sport=data["sport"],
         datetime=dt,
@@ -122,8 +123,9 @@ def create_event():
         lng=float(data["lng"]),
         capacity=int(data["capacity"]),
         price=int(data["price"]),
-        is_free=(int(data["price"]) == 0)
-    )
+        is_free=(int(data["price"]) == 0),
+        user_id=event_id
+        )
 
     db.session.add(event)
     db.session.commit()

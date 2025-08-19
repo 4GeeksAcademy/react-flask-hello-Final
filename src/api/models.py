@@ -37,17 +37,18 @@ class Event(db.Model):
     is_free: Mapped[bool] = mapped_column(Boolean, default=True)
     user_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("users.id"), nullable=False)
-def serialize(self):
-    return {
-        "id": self.id,
-        "sport": self.sport,
-        "datetime": self.datetime.isoformat(),
-        "lat": self.lat,
-        "lng": self.lng,
-        "capacity": self.capacity,
-        "price": self.price,
-        "is_free": self.is_free,
-    }
+    
+    def serialize(self):
+        return {
+            "id": self.id,
+            "sport": self.sport,
+            "datetime": self.datetime.isoformat(),
+            "lat": self.lat,
+            "lng": self.lng,
+            "capacity": self.capacity,
+            "price": self.price,
+            "is_free": self.is_free,
+        }
 
 """
 class EventPlayer(db.Model):

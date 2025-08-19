@@ -1,32 +1,33 @@
-import { Link } from "react-router-dom";
+import React from "react";
 
-export const Navbar = () => {
+export function Navbar() {
+  const isLogged = !!localStorage.getItem("pick4fun_token");
 
-	return (
-		<nav className="navbar navbar-light bg-light">
-			<Link
-				to={"/"}
-			>
-				<h1 style={{ margin: 0 }}>Pick4Fun</h1>
-			</Link>
+  function logout() {
+    localStorage.removeItem("pick4fun_token");
+    window.location.assign("/");
+  }
 
-			<div style={{ display: "flex", gap: 8 }}>
-				<Link
-					to={"/registro"}
-				>
-					Registrarse
-				</Link>
-				<Link
-					to={"/login"}
-				>
-					Iniciar sesión
-				</Link>
-				<Link
-					to={"/events/new"}
-				>
-					Crear evento
-				</Link>
-			</div>
-		</nav>
-	);
-};
+  return (
+    <nav style={bar}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <a href="/" style={brand}>Pick4Fun</a>
+        {isLogged && <a href="/events/new" style={link}>Crear evento</a>}
+      </div>
+
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        {!isLogged && <a href="/register" style={link}>Registrarse</a>}
+        {!isLogged && <a href="/login" style={btnPrimary}>Iniciar sesión</a>}
+        {isLogged && <a href="/home" style={link}>Inicio</a>}
+        {isLogged && <a href="/profile" style={link}>Mi perfil</a>}
+        {isLogged && <button onClick={logout} style={btnDanger}>Salir</button>}
+      </div>
+    </nav>
+  );
+}
+
+const bar = { display:"flex", justifyContent:"space-between", alignItems:"center", padding:"12px 16px", borderBottom:"1px solid #eee", position:"sticky", top:0, background:"#fff", zIndex:50 };
+const brand = { fontWeight:800, textDecoration:"none", color:"#111", fontSize:18 };
+const link = { textDecoration:"none", color:"#333", padding:"6px 8px", borderRadius:8 };
+const btnPrimary = { textDecoration:"none", color:"white", background:"#2563eb", padding:"8px 12px", borderRadius:10 };
+const btnDanger = { color:"white", background:"#ef4444", padding:"8px 12px", border:"none", borderRadius:10, cursor:"pointer" };

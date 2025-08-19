@@ -50,7 +50,7 @@ def login():
         raise APIException("credenciales inválidas", status_code=401)
     
     token = create_access_token(identity=user.id)
-    return jsonify({"access_token": token}), 200
+    return jsonify({"access_token": token, "user": user.serialize()}), 200
 @api.route('/users/me', methods=['GET'])
 @jwt_required()
 def get_profile():
@@ -102,9 +102,9 @@ def get_event(event_id):
         raise APIException("Evento no encontrado", status_code=404)
     return jsonify(event.serialize()), 200
 
-@api.route('/events', methods=['POST'])
+@api.route('/events/<user_id>', methods=['POST'])
 # @jwt_required()
-def create_event():
+def create_event(user_id):
     data = request.get_json() or {}
     required = ["sport", "datetime", "lat", "lng", "capacity", "price"]
     if not all(field in data for field in required):
@@ -124,7 +124,7 @@ def create_event():
         capacity=int(data["capacity"]),
         price=int(data["price"]),
         is_free=(int(data["price"]) == 0),
-        user_id=event_id
+        user_id=user_id
         )
 
     db.session.add(event)

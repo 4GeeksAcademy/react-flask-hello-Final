@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 
 export default function EventNew() {
     const BASE = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:3001";
     const token = localStorage.getItem("pick4fun_token");
+    const user = localStorage.getItem("user");
 
     const [form, setForm] = useState({
     sport: "futbol",
@@ -37,21 +38,27 @@ export default function EventNew() {
 
     try {
       setSaving(true);
-      const res = await fetch(`${BASE}/api/events`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          sport: form.sport,
-          datetime: iso,
-          lat: Number(form.lat),
-          lng: Number(form.lng),
-          capacity: Number(form.capacity),
-          price: Number(form.price),
-        }),
-      });
+      if (user) {
+        let parseUser = JSON.parse(user);
+
+        const res = await fetch(`${BASE}api/events/${parseUser.id}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            sport: form.sport,
+            datetime: iso,
+            lat: Number(form.lat),
+            lng: Number(form.lng),
+            capacity: Number(form.capacity),
+            price: Number(form.price),
+          }),
+        });
+        
+      }
+      
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.message || data.msg || `HTTP ${res.status}`);
 

@@ -1,12 +1,18 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 export function Navbar() {
-  const isLogged = !!localStorage.getItem("pick4fun_token");
+  const location = useLocation();
+  const [isLogged, setIsLogged] = useState(null)
 
   function logout() {
     localStorage.removeItem("pick4fun_token");
     window.location.assign("/");
   }
+
+  useEffect(() => {
+    setIsLogged(localStorage.getItem("pick4fun_token"))
+  }, [location])
 
   return (
     <nav style={bar}>

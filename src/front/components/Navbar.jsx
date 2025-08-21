@@ -24,7 +24,7 @@ export function Navbar() {
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         {!isLogged && <a href="/register" style={link}>Registrarse</a>}
         {!isLogged && <a href="/login" style={btnPrimary}>Iniciar sesión</a>}
-        {isLogged && <a href="/home" style={link}>Inicio</a>}
+        {isLogged && <a href="/" style={link}>Inicio</a>}
         {isLogged && <a href="/profile" style={link}>Mi perfil</a>}
         {isLogged && <button onClick={logout} style={btnDanger}>Salir</button>}
       </div>

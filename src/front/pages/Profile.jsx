@@ -10,12 +10,14 @@ export default function Profile() {
         name:"",
         level:1,
     });
+    
     const[loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [err, setErr] = useState("");
 
     useEffect(() => {
-        const token = localStorage.gotItem("pick4fun_token");
+        const token = localStorage.getItem("pick4fun_token");
+        const user = localStorage.getItem("user");
         if (!token) {
             alert("Debes iniciar sesion.");
             navigate("/login");
@@ -25,19 +27,23 @@ export default function Profile() {
         let mounted = true;
         (async () => {
             try {
-                const res = await fetch(`${BASE}/api/users/me`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                const data = await res.json().catch(() =>({}));
-                if (!res.ok) throw new Error(data.message || data.msg || `HTTP ${res.status}`);
+                if (user) {
+                    let parseUser = JSON.parse(user);
 
-                if (mounted) {
-                    setForm({
-                        email: data.email ||"",
-                        name: data.name ||"",
-                        level: data.level ?? 1,
+                    const res = await fetch(`${BASE}api/users/me/${parseUser.id}`, {
                     });
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok) throw new Error(data.message || data.msg || `HTTP ${res.status}`);
+
+                    if (mounted) {
+                        setForm({
+                            email: data.email || "",
+                            name: data.name || "",
+                            level: data.level ?? 1,
+                        });
+                    }
                 }
+
             } catch (e) {
                 if (mounted) setErr(e.message || "No se pudo cargar el perfil.");
             } finally {
@@ -46,7 +52,7 @@ export default function Profile() {
         })();
 
         return () => { mounted = false; };
-    }, [BASE, navvigate]);
+    }, [BASE, navigate]);
 
     function handleChange(e) {
         const { name, value } = e.target;

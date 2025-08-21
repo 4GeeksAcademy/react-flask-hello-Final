@@ -13,6 +13,7 @@ import Register from "./pages/Registro";
 import Login from "./pages/Login";
 import EventNew from "./pages/EventNew";
 import EventDetail from "./pages/EventDetail";
+import Profile from "./pages/Profile";
 
 export const router = createBrowserRouter(
     createRoutesFromElements(
@@ -33,6 +34,7 @@ export const router = createBrowserRouter(
         <Route path="Login" element={<Login />} />
         <Route path="events/new" element={<EventNew />} />
         <Route path="events/:id" element={<EventDetail />} />
+        <Route path="profile" element={<Profile />} />
       </Route>
     )
 );

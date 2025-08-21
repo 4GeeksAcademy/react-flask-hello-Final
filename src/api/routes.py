@@ -51,14 +51,14 @@ def login():
     
     token = create_access_token(identity=user.id)
     return jsonify({"access_token": token, "user": user.serialize()}), 200
-@api.route('/users/me', methods=['GET'])
-@jwt_required()
-def get_profile():
-    user_id = get_jwt_identity()
+
+@api.route('/users/me/<user_id>', methods=['GET'])
+def get_profile(user_id):
     user = User.query.get(user_id)
     if not user:
         raise APIException("Usuario no encontrado", status_code=404)
     return jsonify(user.serialize()), 200
+
 @api.route('/users/me', methods=['PUT'])
 @jwt_required()
 def update_profile():
@@ -129,7 +129,7 @@ def create_event(user_id):
 
     db.session.add(event)
     db.session.commit()
-    return jsonify(event.serialize()), 201
+    return jsonify(event.serialize()), 200
 
 @api.route('/events/<int:event_id>', methods=['PUT'])
 @jwt_required()

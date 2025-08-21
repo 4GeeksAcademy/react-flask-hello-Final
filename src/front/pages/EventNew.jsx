@@ -56,11 +56,11 @@ export default function EventNew() {
             price: Number(form.price),
           }),
         });
-        
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || data.msg || `HTTP ${res.status}`);
       }
       
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.message || data.msg || `HTTP ${res.status}`);
+      
 
       alert("Evento creado");
       window.location.assign("/"); // vuelve a Home para verlo listado

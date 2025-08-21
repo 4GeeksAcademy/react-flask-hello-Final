@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import EventCard from "../components/EventCard";
 
 export function Home() {
-  const BASE = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:5000";
+  const BASE = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:3001";
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");

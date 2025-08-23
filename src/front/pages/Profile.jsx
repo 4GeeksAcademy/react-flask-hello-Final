@@ -156,7 +156,7 @@ export default function Profile() {
 
     <div style={{ maxWidth: 520, margin: "24px auto", padding: 16 }}>
       <h2>Mi Perfil</h2>
-      
+
 
       <div style={{ marginBottom: 12 }}>
         <label>Foto de perfil</label>
@@ -249,5 +249,7 @@ export default function Profile() {
             </button>
           </div>
         </form>
-      );
- }
+      </div>
+    </div>
+  );
+}

@@ -41,7 +41,7 @@ export default function Login() {
       if (!res.ok) throw new Error(data.message || data.msg || `HTTP ${res.status}`);
 
       localStorage.setItem("pick4fun_token", data.access_token);
-      localStorage.setItem("userr", JSON.stringify(data.user));
+      localStorage.setItem("user", JSON.stringify(data.user));
 
       
       navigate("/", { replace: true });

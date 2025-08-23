@@ -14,6 +14,7 @@ class User(db.Model):
     is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False)
     name: Mapped[str] = mapped_column(String(80), nullable=False)
     level: Mapped[int] = mapped_column(Integer, default=1)
+    avatar_url: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow)
     def serialize(self):
@@ -22,6 +23,7 @@ class User(db.Model):
             "email": self.email,
             "name": self.name,
             "level": self.level,
+            "avatar_url": self.avatar_url,
             "created_at": self.created_at.isoformat(),
             # do not serialize the password, its a security breach
         }

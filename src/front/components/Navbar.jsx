@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 
 export function Navbar() {
   const location = useLocation();
+  const [user, setUser] = useState(null);
   const [isLogged, setIsLogged] = useState(null)
 
   function logout() {
@@ -12,7 +13,14 @@ export function Navbar() {
 
   useEffect(() => {
     setIsLogged(localStorage.getItem("pick4fun_token"))
-  }, [location])
+
+    try {
+      const u = localStorage.getItem("pick4fun_token");
+      setUser(u ? JSON.parse(u) : null);
+    } catch {
+      setUser(null);
+    }
+    }, [location])
 
   return (
     <nav style={bar}>
@@ -25,7 +33,29 @@ export function Navbar() {
         {!isLogged && <a href="/register" style={link}>Registrarse</a>}
         {!isLogged && <a href="/login" style={btnPrimary}>Iniciar sesión</a>}
         {isLogged && <a href="/" style={link}>Inicio</a>}
-        {isLogged && <a href="/profile" style={link}>Mi perfil</a>}
+        {isLogged &&(
+        <a href="/profile" style={{ ...link,padding: 0 }}>
+          {user?.avatar_url ? (
+            <img src={user.avatar_url} alt="avatar" style={{width: 32, height: 32, borderRadius: "50%", objectFit: "cover", border: "1px solid #eee" }}
+            />
+          ) : (
+            <span style={{
+                display: "inline-flex",
+                width: 32,
+                height: 32,
+                borderRadius: "50%",
+                background: "#e5e7eb",
+                color: "#111",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: 700
+            }}
+          >
+            {(user?.name || "?").charAt(0).toUpperCase()}
+          </span>
+          )}
+          </a>
+        )}
         {isLogged && <button onClick={logout} style={btnDanger}>Salir</button>}
       </div>
     </nav>

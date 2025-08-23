@@ -41,7 +41,7 @@ export default function EventNew() {
       if (user) {
         let parseUser = JSON.parse(user);
 
-        const res = await fetch(`${BASE}api/events/${parseUser.id}`, {
+        const res = await fetch(`${BASE}/api/events/${parseUser.id}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

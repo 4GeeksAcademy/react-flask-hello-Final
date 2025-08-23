@@ -72,6 +72,8 @@ def update_profile():
         user.name = data["name"]
     if "level" in data:
         user.level = data["level"]
+    if "avatar_url" in data:
+        user.avatar_url = data["avatar_url"]
 
     db.session.commit()
     return jsonify({"msg": "Perfil actualizado"}), 200

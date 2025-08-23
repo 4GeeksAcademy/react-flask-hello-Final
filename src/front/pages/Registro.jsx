@@ -56,9 +56,14 @@ async function handleSubmit(e) {
             headers: {"content-Type": "application/json"},
             body: JSON.stringify(form),
     });
+    const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-    }
+        if (res.status === 409) {
+          alert("Ese email ya está registrado. Inicia sesión o usa otro email.");
+          return;
+        }
+    throw new Error(data.message || data.msg || `HTTP ${res.status}`);
+}
 
     alert("Usuario Creado. Ahora inicia sesion.");
     navigate("/login");

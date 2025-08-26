@@ -9,6 +9,16 @@ const sportGallery = [
   { key: "running", label: "Running", img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&auto=format&fit=crop" },
 ];
 
+const [idx, setIdx] = useState(0);
+const total = sportGallery.length;
+
+function next() {
+  setIdx((i) => (i + 1) % total);
+}
+function prev() {
+  setIdx((i) => (i - 1 + total) % total);
+}
+
 export function Home() {
   const BASE = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:3001";
   const [events, setEvents] = useState([]);
@@ -44,7 +54,7 @@ export function Home() {
     }
 
     try {
-      const res = await fetch(`${BASE}api/events/${eventId}/join`, {
+      const res = await fetch(`${BASE}/api/events/${eventId}/join`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,7 +65,7 @@ export function Home() {
       if (!res.ok) throw new Error(data.message || data.msg || `HTTP ${res.status}`);
 
       alert("Te has unido al evento.");
-      const refresh = await fetch(`${BASE}api/events`);
+      const refresh = await fetch(`${BASE}/api/events`);
       const list = await refresh.json().catch(() => []);
       if (refresh.ok) setEvents(list);
     } catch (e) {
@@ -91,26 +101,6 @@ export function Home() {
       </div>
     );
   }
-
-  const [idx, setIdx] = useState(0);
-  const total = sportGallery.length;
-
-  function next() {
-    setIdx((i) => (i + 1) % total);
-  }
-  function prev() {
-    setIdx((i) => (i - 1 + total) % total);
-  }
-  function handleWheel(e) {
-    e.preventDefault();
-    if (e.deltaY > 0) next();
-    else if (e.deltaY < 0) prev();
-  }
-  function handleKeyDown(e) {
-    if (e.key === "ArrowDown") { e.preventDefault(); next(); }
-    if (e.key === "ArrowUp")   { e.preventDefault(); prev(); }
-  }
-
 
   return (
       <div style={twoCols}>

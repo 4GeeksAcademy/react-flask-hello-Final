@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
@@ -16,21 +16,20 @@ export default function Profile() {
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
 
-  const fileInputRef = useRef(null);
-  function openFilePicker() {
-    if (fileInputRef.current) fileInputRef.current.click();
-  }
-
-  function handleFileSelected(e) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result;
-      setForm((prev) => ({ ...prev, avatar_url: String(dataUrl) }));
-    };
-    reader.readAsDataURL(file);
-  }
+  function handleAvatarClick() {
+    const url = window.prompt(
+      "Introduce la URL de tu foto (https://...)",
+      form.avatar_url || ""
+    );
+    if (!url) return;
+    const ok = /^https?:\/\/\S+\.(png|jpe?g|gif|webp|svg)(\?\S*)?$/i.test(url) ||
+      /^https?:\/\/\S+$/i.test(url);
+      if (!ok) {
+        alert("URL invalidda. Debe empezar por http...");
+        return;
+      }
+      setForm((prev) => ({ ...prev, avatar_url: url }));
+    }
 
   useEffect(() => {
     const token = localStorage.getItem("pick4fun_token");
@@ -87,7 +86,7 @@ export default function Profile() {
     }
     try {
       setSaving(true);
-      const res = await fetch(`${BASE}/api/users/me`, {
+      const res = await fetch(`${BASE}api/users/me`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -96,13 +95,13 @@ export default function Profile() {
         body: JSON.stringify({
           name: form.name,
           level: form.level,
-          avatar_url: form.avatar_url
+          avatar_url: form.avatar_url,
         }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.message || data.msg || `HTTP ${res.status}`)
 
-      const me = await fetch(`${BASE}/api/users/me`,
+      const me = await fetch(`${BASE}api/users/me`,
         {
           headers: { Authorization: `Bearer ${token}` }
         })
@@ -129,7 +128,7 @@ export default function Profile() {
       return;
 
     try {
-      const res = await fetch(`${BASE}/api/users/me`, {
+      const res = await fetch(`${BASE}api/users/me`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -154,13 +153,14 @@ export default function Profile() {
 
   return (
 
-    <div style={{ maxWidth: 520, margin: "24px auto", padding: 16 }}>
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
+    <div style={{ maxWidth: 520, width: "100%", padding: 16, textAlign: "center" }}>
       <h2>Mi Perfil</h2>
 
 
       <div style={{ marginBottom: 12 }}>
         <label>Foto de perfil</label>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8 }}>
+        <div style={{ display: "flex", justifyContent: "center", gap: 12, marginTop: 8 }}>
           {form.avatar_url ? (
             <img
               src={form.avatar_url}
@@ -174,12 +174,12 @@ export default function Profile() {
                 cursor: "pointer",
               }}
 
-              onClick={openFilePicker}
+              onClick={handleAvatarClick}
               title="Cambiar foto"
             />
           ) : (
             <div
-              onClick={openFilePicker}
+              onClick={handleAvatarClick}
               style={{
                 width: 96,
                 height: 96,
@@ -191,19 +191,12 @@ export default function Profile() {
                 cursor: "pointer",
                 color: "#999",
               }}
+              title="Añadir URL de tu foto"
             >
               FOTO
             </div>
           )}
         </div>
-
-        <input
-          type="file"
-          accept="image/*"
-          ref={fileInputRef}
-          style={{ display: "none" }}
-          onChange={handleFileSelected}
-        />
 
         <form onSubmit={handleSave}>
           <div style={{ marginBottom: 12 }}>
@@ -249,6 +242,7 @@ export default function Profile() {
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>
   );

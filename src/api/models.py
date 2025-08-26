@@ -17,6 +17,7 @@ class User(db.Model):
     avatar_url: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow)
+    
     def serialize(self):
         return {
             "id": self.id,
@@ -25,7 +26,7 @@ class User(db.Model):
             "level": self.level,
             "avatar_url": self.avatar_url,
             "created_at": self.created_at.isoformat(),
-            # do not serialize the password, its a security breach
+            
         }
 class Event(db.Model):
     __tablename__ = "events"

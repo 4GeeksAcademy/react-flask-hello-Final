@@ -151,6 +151,7 @@ def update_event(event_id):
 
         db.session.commit()
         return jsonify(event.serialize()), 200
+    
 @api.route('/events/<int:event_id>', methods=['DELETE'])
 @jwt_required()
 def delete_event(event_id):
@@ -163,7 +164,7 @@ def delete_event(event_id):
     db.session.commit()
     return jsonify({"msg": "Evento eliminado"}), 200
 
-"""
+
 @api.route('/events/<int:event_id>/join', methods=['POST'])
 @jwt_required()
 def join_event(event_id):
@@ -187,4 +188,3 @@ def join_event(event_id):
     db.session.add(inscription)
     db.session.commit()
     return jsonify(inscription.serialize()), 201
-"""

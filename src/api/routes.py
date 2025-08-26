@@ -59,20 +59,20 @@ def get_profile(user_id):
         raise APIException("Usuario no encontrado", status_code=404)
     return jsonify(user.serialize()), 200
 
-@api.route('/users/me', methods=['PUT'])
-@jwt_required()
-def update_profile():
-    user_id = get_jwt_identity()
+@api.route('/users/me/<user_id>', methods=['PUT'])
+def update_profile(user_id):
     data = request.get_json() or {}
+    print(data)
     user = User.query.get(user_id)
     if not user:
         raise APIException("Usuario no encontrado", status_code=404)
-    
+
     if "name" in data:
         user.name = data["name"]
     if "level" in data:
         user.level = data["level"]
     if "avatar_url" in data:
+        print(data["avatar_url"])
         user.avatar_url = data["avatar_url"]
 
     db.session.commit()

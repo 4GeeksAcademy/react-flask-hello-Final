@@ -15,6 +15,8 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
+  const token = localStorage.getItem("pick4fun_token");
+  const user = localStorage.getItem("user");
 
   function handleAvatarClick() {
     const url = window.prompt(
@@ -24,16 +26,16 @@ export default function Profile() {
     if (!url) return;
     const ok = /^https?:\/\/\S+\.(png|jpe?g|gif|webp|svg)(\?\S*)?$/i.test(url) ||
       /^https?:\/\/\S+$/i.test(url);
-      if (!ok) {
-        alert("URL invalidda. Debe empezar por http...");
-        return;
-      }
-      setForm((prev) => ({ ...prev, avatar_url: url }));
+    if (!ok) {
+      alert("URL invalidda. Debe empezar por http...");
+      return;
     }
+    setForm((prev) => ({ ...prev, avatar_url: url }));
+  }
+  console.log(form)
 
   useEffect(() => {
-    const token = localStorage.getItem("pick4fun_token");
-    const user = localStorage.getItem("user");
+
     if (!token) {
       alert("Debes iniciar sesion.");
       navigate("/login");
@@ -46,8 +48,7 @@ export default function Profile() {
         if (user) {
           let parseUser = JSON.parse(user);
 
-          const res = await fetch(`${BASE}api/users/me/${parseUser.id}`, {
-          });
+          const res = await fetch(`${BASE}api/users/me/${parseUser.id}`);
           const data = await res.json().catch(() => ({}));
           if (!res.ok) throw new Error(data.message || data.msg || `HTTP ${res.status}`);
 
@@ -86,7 +87,11 @@ export default function Profile() {
     }
     try {
       setSaving(true);
-      const res = await fetch(`${BASE}api/users/me`, {
+      let parseUser = JSON.parse(user);
+
+      console.log(parseUser)
+
+      const res = await fetch(`${BASE}api/users/me/${parseUser.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -124,7 +129,7 @@ export default function Profile() {
       navigate("/login");
       return;
     }
-    if (!confirm("¿EStas seguro de que quieres elliminar tu cuenta? Esto no se podra deshacer."))
+    if (!confirm("¿EStas seguro de que quieres eliminar tu cuenta? Esto no se podra deshacer."))
       return;
 
     try {
@@ -136,6 +141,8 @@ export default function Profile() {
       if (!res.ok) throw new Error(data.message || data.msg || `HTTP ${res.status}`);
 
       localStorage.removeItem("pick4fun_token");
+      localStorage.removeItem("user");
+      
       alert("Cuenta eliminada.");
       navigate("/");
     } catch (e) {
@@ -154,94 +161,94 @@ export default function Profile() {
   return (
 
     <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
-    <div style={{ maxWidth: 520, width: "100%", padding: 16, textAlign: "center" }}>
-      <h2>Mi Perfil</h2>
+      <div style={{ maxWidth: 520, width: "100%", padding: 16, textAlign: "center" }}>
+        <h2>Mi Perfil</h2>
 
 
-      <div style={{ marginBottom: 12 }}>
-        <label>Foto de perfil</label>
-        <div style={{ display: "flex", justifyContent: "center", gap: 12, marginTop: 8 }}>
-          {form.avatar_url ? (
-            <img
-              src={form.avatar_url}
-              alt="preview"
-              style={{
-                width: 96,
-                height: 96,
-                borderRadius: "50%",
-                objectFit: "cover",
-                border: "2px solid #e5e7eb",
-                cursor: "pointer",
-              }}
+        <div style={{ marginBottom: 12 }}>
+          <label>Foto de perfil</label>
+          <div style={{ display: "flex", justifyContent: "center", gap: 12, marginTop: 8 }}>
+            {form.avatar_url ? (
+              <img
+                src={form.avatar_url}
+                alt="preview"
+                style={{
+                  width: 96,
+                  height: 96,
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  border: "2px solid #e5e7eb",
+                  cursor: "pointer",
+                }}
 
-              onClick={handleAvatarClick}
-              title="Cambiar foto"
-            />
-          ) : (
-            <div
-              onClick={handleAvatarClick}
-              style={{
-                width: 96,
-                height: 96,
-                borderRadius: "50%",
-                border: "2px dashed #ccc",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                color: "#999",
-              }}
-              title="Añadir URL de tu foto"
-            >
-              FOTO
+                onClick={handleAvatarClick}
+                title="Cambiar foto"
+              />
+            ) : (
+              <div
+                onClick={handleAvatarClick}
+                style={{
+                  width: 96,
+                  height: 96,
+                  borderRadius: "50%",
+                  border: "2px dashed #ccc",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  color: "#999",
+                }}
+                title="Añadir URL de tu foto"
+              >
+                FOTO
+              </div>
+            )}
+          </div>
+
+          <form onSubmit={handleSave}>
+            <div style={{ marginBottom: 12 }}>
+              <label>Email (no editable)</label>
+              <input className="form-control" value={form.email} disabled />
             </div>
-          )}
-        </div>
 
-        <form onSubmit={handleSave}>
-          <div style={{ marginBottom: 12 }}>
-            <label>Email (no editable)</label>
-            <input className="form-control" value={form.email} disabled />
-          </div>
+            <div style={{ marginBottom: 12 }}>
+              <label>Nombre</label>
+              <input
+                className="form-control"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                placeholder="Tu nombre"
+              />
+            </div>
 
-          <div style={{ marginBottom: 12 }}>
-            <label>Nombre</label>
-            <input
-              className="form-control"
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              placeholder="Tu nombre"
-            />
-          </div>
+            <div style={{ marginBottom: 12 }}>
+              <label>Nivel (1-5)</label>
+              <input
+                className="form-control"
+                name="level"
+                type="number"
+                min={1}
+                max={5}
+                value={form.level}
+                onChange={handleChange}
+              />
+            </div>
 
-          <div style={{ marginBottom: 12 }}>
-            <label>Nivel (1-5)</label>
-            <input
-              className="form-control"
-              name="level"
-              type="number"
-              min={1}
-              max={5}
-              value={form.level}
-              onChange={handleChange}
-            />
-          </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <button className="btn btn-primary" type="submit" disabled={saving}>
+                {saving ? "Guardando..." : "Guardar cambios"}
+              </button>
 
-          <div style={{ display: "flex", gap: 8 }}>
-            <button className="btn btn-primary" type="submit" disabled={saving}>
-              {saving ? "Guardando..." : "Guardar cambios"}
-            </button>
+              <button className="btn btn-secondary" type="button" onClick={handleLogout}>
+                Cerrar sesión
+              </button>
 
-            <button className="btn btn-secondary" type="button" onClick={handleLogout}>
-              Cerrar sesión
-            </button>
-
-            <button className="btn btn-danger" type="button" onClick={handleDelete}>
-              Eliminar cuenta
-            </button>
-          </div>
-        </form>
+              <button className="btn btn-danger" type="button" onClick={handleDelete}>
+                Eliminar cuenta
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

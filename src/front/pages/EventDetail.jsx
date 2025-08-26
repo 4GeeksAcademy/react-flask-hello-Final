@@ -43,7 +43,7 @@ export default function EventDetail() {
       const res = await fetch(`${BASE}api/events/${id}/join`, {
         method: "POST",
         headers: {
-          "content-type": "application/json",
+          "Content-type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({note}),
@@ -79,7 +79,7 @@ export default function EventDetail() {
             className="form-control"
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="Ej: Tengo experiencia, ¿queda plaza?"
+            placeholder="Ej: llevo mucho tiempo jugando, ¿queda plaza?"
             style={{ marginBottom: 12 }}
           />
           <button className="btn btn-primary" disabled={joining}>

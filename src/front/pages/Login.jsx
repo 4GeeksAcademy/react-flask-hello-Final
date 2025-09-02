@@ -43,8 +43,8 @@ export default function Login() {
       localStorage.setItem("pick4fun_token", data.access_token);
       localStorage.setItem("user", JSON.stringify(data.user));
 
-      
-      navigate("/", { replace: true });
+      window.location.href = "/";
+
     } catch (err) {
       alert("✖ " + (err?.message || "No se pudo iniciar sesión"));
     } finally {

@@ -36,7 +36,15 @@ def register():
     db.session.add(user)
     db.session.commit()
 
-    return jsonify({"msg": "Usuario creado correctamente"}), 201
+    access_token = create_access_token(identity=str(user.id))  
+    user_data = user.serialize()
+
+    return jsonify({
+        "access_token": access_token,
+        "user": user_data,
+        "msg": "Usuario creado correctamente"
+    }), 201
+
 
 @api.route('/auth/login', methods=['POST'])
 def login():
@@ -47,20 +55,27 @@ def login():
 
     user = User.query.filter_by(email=email).first()
     if not user or not check_password_hash(user.password_hash, password):
-        raise APIException("credenciales inválidas", status_code=401)
+        raise APIException("Usuario no encontrado, registrate o inicia sesion con credenciales validas.", status_code=401)
     
-    token = create_access_token(identity=user.id)
-    return jsonify({"access_token": token, "user": user.serialize()}), 200
+    access_token = create_access_token(identity=str(user.id))
+    return jsonify({
+        "access_token": access_token, 
+        "user": user.serialize()
+    }), 200
 
 @api.route('/users/me/<user_id>', methods=['GET'])
+@jwt_required()
 def get_profile(user_id):
+    user_id = get_jwt_identity()
     user = User.query.get(user_id)
     if not user:
         raise APIException("Usuario no encontrado", status_code=404)
     return jsonify(user.serialize()), 200
 
 @api.route('/users/me/<user_id>', methods=['PUT'])
+@jwt_required()
 def update_profile(user_id):
+    user_id = get_jwt_identity()
     data = request.get_json() or {}
     print(data)
     user = User.query.get(user_id)
@@ -76,7 +91,7 @@ def update_profile(user_id):
         user.avatar_url = data["avatar_url"]
 
     db.session.commit()
-    return jsonify({"msg": "Perfil actualizado"}), 200
+    return jsonify({"msg": "Perfil actualizado", "user": user.serialize()}), 200
 
 @api.route('/users/me', methods=['DELETE'])
 @jwt_required()
@@ -104,25 +119,28 @@ def get_event(event_id):
         raise APIException("Evento no encontrado", status_code=404)
     return jsonify(event.serialize()), 200
 
-@api.route('/events/<user_id>', methods=['POST'])
-# @jwt_required()
-def create_event(user_id):
+@api.route('/events', methods=['POST'])
+@jwt_required()
+def create_event():
+    user_id = get_jwt_identity()
     data = request.get_json() or {}
-    required = ["sport", "datetime", "lat", "lng", "capacity", "price"]
+    required = ["title", "sport", "datetime", "capacity", "price", "address"]
     if not all(field in data for field in required):
         raise APIException("Faltan campos obligatorios", status_code=400)
-    
+
     try:
-        dt = _dt.fromisoformat(data["datetime"])
-    except Exception:
+        dt = _dt.fromisoformat(data["datetime"].replace("Z", "+00:00"))
+    except Exception as e:
+        print("Error parsing datetime:", e)
         raise APIException(
             "Formato de fecha/hora invalido (usa ISO 8601)", status_code=400)
     
     event = Event(
+         title=data["title"],  # Nuevo campo
         sport=data["sport"],
+        description=data.get("description"),  # Nuevo campo (opcional)
         datetime=dt,
-        lat=float(data["lat"]),
-        lng=float(data["lng"]),
+        address=data["address"],
         capacity=int(data["capacity"]),
         price=int(data["price"]),
         is_free=(int(data["price"]) == 0),
@@ -131,7 +149,7 @@ def create_event(user_id):
 
     db.session.add(event)
     db.session.commit()
-    return jsonify(event.serialize()), 200
+    return jsonify(event.serialize()), 201
 
 @api.route('/events/<int:event_id>', methods=['PUT'])
 @jwt_required()
@@ -141,30 +159,62 @@ def update_event(event_id):
     if not event:
         raise APIException("Evento no encontrado", status_code=404)
     
+    current_user_id = get_jwt_identity()
+    if event.user_id != current_user_id:
+        raise APIException("No autorizado", status_code=403)
+    
     data = request.get_json() or {}
 
-    for field in ["sport", "datetime", "lat", "lng", "capacity", "price"]:
+    for field in ["sport", "datetime", "capacity", "price", "title", "description", "address"]:
         if field in data:
             setattr(event, field, type(getattr(event, field))(data[field]))
 
-        event.is_free = (event.price == 0)
+    event.is_free = (event.price == 0)
 
-        db.session.commit()
-        return jsonify(event.serialize()), 200
+    db.session.commit()
+    return jsonify(event.serialize()), 200
     
 @api.route('/events/<int:event_id>', methods=['DELETE'])
 @jwt_required()
 def delete_event(event_id):
+    try:
+        print("=== DELETE DEBUG ===")
+        
+        # Debug del usuario actual
+        current_user_id = get_jwt_identity()
+        print(f"🔑 JWT Identity: {current_user_id}")
+        print(f"🔑 Type of JWT Identity: {type(current_user_id)}")
+        
+        # Debug del usuario en la base de datos
+        current_user = User.query.get(current_user_id)
+        print(f"🔑 User from DB: {current_user}")
+        print(f"🔑 User ID from DB: {current_user.id if current_user else 'None'}")
+        
+        # Debug del evento
+        event = Event.query.get(event_id)
+        print(f"🔍 Event to delete: {event}")
+        print(f"🔍 Event user_id: {event.user_id if event else 'None'}")
+        
+        if not event:
+            return jsonify({"msg": "Evento no encontrado"}), 404
+        
+        # Verificación
+        print(f"🔍 Comparison: {event.user_id} == {current_user_id} -> {event.user_id == current_user_id}")
+        
+        if event.user_id != current_user_id:
+            return jsonify({"msg": "No autorizado"}), 403
+        
+        db.session.delete(event)
+        db.session.commit()
+        
+        return jsonify({"msg": "Evento eliminado"}), 200
+        
+    except Exception as e:
+        print(f"❌ Error: {str(e)}")
+        db.session.rollback()
+        return jsonify({"msg": f"Error: {str(e)}"}), 500
 
-    event = Event.query.get(event_id)
-    if not event:
-        raise APIException("Evento no encontrado", status_code=404)
-    
-    db.session.delete(event)
-    db.session.commit()
-    return jsonify({"msg": "Evento eliminado"}), 200
-
-
+"""
 @api.route('/events/<int:event_id>/join', methods=['POST'])
 @jwt_required()
 def join_event(event_id):
@@ -188,3 +238,5 @@ def join_event(event_id):
     db.session.add(inscription)
     db.session.commit()
     return jsonify(inscription.serialize()), 201
+
+"""

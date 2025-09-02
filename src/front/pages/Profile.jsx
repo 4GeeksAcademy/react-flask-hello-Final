@@ -27,12 +27,11 @@ export default function Profile() {
     const ok = /^https?:\/\/\S+\.(png|jpe?g|gif|webp|svg)(\?\S*)?$/i.test(url) ||
       /^https?:\/\/\S+$/i.test(url);
     if (!ok) {
-      alert("URL invalidda. Debe empezar por http...");
+      alert("URL invalida. Debe empezar por http...");
       return;
     }
     setForm((prev) => ({ ...prev, avatar_url: url }));
   }
-  console.log(form)
 
   useEffect(() => {
 
@@ -48,7 +47,12 @@ export default function Profile() {
         if (user) {
           let parseUser = JSON.parse(user);
 
-          const res = await fetch(`${BASE}api/users/me/${parseUser.id}`);
+          const res = await fetch(`${BASE}api/users/me/${parseUser.id}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
           const data = await res.json().catch(() => ({}));
           if (!res.ok) throw new Error(data.message || data.msg || `HTTP ${res.status}`);
 
@@ -70,7 +74,7 @@ export default function Profile() {
     })();
 
     return () => { mounted = false; };
-  }, [BASE, navigate]);
+  }, [BASE, navigate, token, user]);
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -103,20 +107,25 @@ export default function Profile() {
           avatar_url: form.avatar_url,
         }),
       });
+      
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.message || data.msg || `HTTP ${res.status}`)
+      if (!res.ok) throw new Error(data.message || data.msg || `HTTP ${res.status}`)  
 
-      const me = await fetch(`${BASE}api/users/me`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-        .then(r => r.json())
-        .catch(() => null)
-      if (me) localStorage.setItem("user", JSON.stringify(me));
+      const current = JSON.parse(localStorage.getItem("user") || "{}");
+      const updated = {
+        ...current,
+        name: form.name,
+        level: form.level,
+        avatar_url: form.avatar_url,
+      };
+      localStorage.setItem("user", JSON.stringify(updated));
+
+      
+      window.dispatchEvent(new Event("user-updated"));
+
       alert("Perfil actualizado");
-
     } catch (e) {
-      alert("X" + (e.message || "No se pudo actualizar"));
+      alert("X " + (e.message || "No se pudo actualizar"));
     } finally {
       setSaving(false);
     }
@@ -152,6 +161,8 @@ export default function Profile() {
 
   function handleLogout() {
     localStorage.removeItem("pick4fun_token");
+    localStorage.removeItem("user");
+    window.dispatchEvent(new Event("user-updated"));
     navigate("/login");
   }
 

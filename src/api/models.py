@@ -31,28 +31,29 @@ class User(db.Model):
 class Event(db.Model):
     __tablename__ = "events"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    title: Mapped[str] = mapped_column(String(100), nullable=False) 
     sport: Mapped[str] = mapped_column(String(50), nullable=False)
+    description: Mapped[str | None] = mapped_column(String(500), nullable=True)  
     datetime: Mapped[DateTime] = mapped_column(DateTime, nullable=False)
-    lat: Mapped[float] = mapped_column(Float, nullable=False)
-    lng: Mapped[float] = mapped_column(Float, nullable=False)
+    address: Mapped[str] = mapped_column(String(200), nullable=True)
     capacity: Mapped[int] = mapped_column(Integer, nullable=False)
     price: Mapped[int] = mapped_column(Integer, default=0)
     is_free: Mapped[bool] = mapped_column(Boolean, default=True)
-    user_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("users.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False)
     
     def serialize(self):
         return {
             "id": self.id,
+            "title": self.title,  # Incluir en serialización
             "sport": self.sport,
+            "description": self.description,  # Incluir en serialización
             "datetime": self.datetime.isoformat(),
-            "lat": self.lat,
-            "lng": self.lng,
+            "address": self.address, 
             "capacity": self.capacity,
             "price": self.price,
             "is_free": self.is_free,
+            "user_id": self.user_id,
         }
-
 """
 class EventPlayer(db.Model):
     __tablename__= "event_players"

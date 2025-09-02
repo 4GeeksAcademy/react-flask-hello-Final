@@ -4,66 +4,116 @@ import { useLocation } from "react-router-dom";
 export function Navbar() {
   const location = useLocation();
   const [user, setUser] = useState(null);
-  const [isLogged, setIsLogged] = useState(null)
+  const [isLogged, setIsLogged] = useState(false);
 
   function logout() {
     localStorage.removeItem("pick4fun_token");
-    window.location.assign("/");
+    localStorage.removeItem("user");
+    window.location.href = "/";
   }
 
-  useEffect(() => {
-    setIsLogged(localStorage.getItem("pick4fun_token"))
-
+  // Cargar estado desde localStorage
+  function loadAuthFromStorage() {
+    const token = localStorage.getItem("pick4fun_token");
+    const storedUser = localStorage.getItem("user");
+    setIsLogged(!!token);
     try {
-      const u = localStorage.getItem("pick4fun_token");
-      setUser(u ? JSON.parse(u) : null);
+      setUser(storedUser ? JSON.parse(storedUser) : null);
     } catch {
       setUser(null);
     }
-    }, [location])
+  }
+
+  useEffect(() => {
+    loadAuthFromStorage();
+  }, [location]);
+
+  useEffect(() => {
+    function handleUserUpdated() {
+      loadAuthFromStorage();
+    }
+    window.addEventListener("user-updated", handleUserUpdated);
+    return () => window.removeEventListener("user-updated", handleUserUpdated);
+  }, []);
 
   return (
-    <nav style={bar}>
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <a href="/" style={brand}>Pick4Fun</a>
-        {isLogged && <a href="/events/new" style={link}>Crear evento</a>}
-      </div>
-
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        {!isLogged && <a href="/register" style={link}>Registrarse</a>}
-        {!isLogged && <a href="/login" style={btnPrimary}>Iniciar sesión</a>}
-        {isLogged && <a href="/" style={link}>Inicio</a>}
-        {isLogged &&(
-        <a href="/profile" style={{ ...link,padding: 0 }}>
-          {user?.avatar_url ? (
-            <img src={user.avatar_url} alt="avatar" style={{width: 32, height: 32, borderRadius: "50%", objectFit: "cover", border: "1px solid #eee" }}
-            />
-          ) : (
-            <span style={{
-                display: "inline-flex",
-                width: 32,
-                height: 32,
-                borderRadius: "50%",
-                background: "#e5e7eb",
-                color: "#111",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: 700
-            }}
-          >
-            {(user?.name || "?").charAt(0).toUpperCase()}
-          </span>
-          )}
-          </a>
-        )}
-        {isLogged && <button onClick={logout} style={btnDanger}>Salir</button>}
+    <nav className="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm" style={{zIndex: 1050}}>
+      <div className="container">
+        
+        <a className="navbar-brand fw-bold fs-4" href="/">
+          Pick4Fun
+        </a>
+        
+     
+        <button 
+          className="navbar-toggler" 
+          type="button" 
+          data-bs-toggle="collapse" 
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav" 
+          aria-expanded="false" 
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+        
+      
+        <div className="collapse navbar-collapse" id="navbarNav">
+          <div className="navbar-nav me-auto"></div>
+          
+          <div className="d-flex align-items-center gap-2">
+            {!isLogged ? (
+              <>
+                <a className="nav-link" href="/register">
+                  Registrarse
+                </a>
+                <a className="btn btn-primary" href="/login">
+                  Iniciar sesión
+                </a>
+              </>
+            ) : (
+              <>
+                <a className="nav-link" href="/">
+                  Inicio
+                </a>
+                <a href="/profile" className="nav-link p-0">
+                  {user?.avatar_url ? (
+                    <img
+                      src={user.avatar_url}
+                      alt="avatar"
+                      className="rounded-circle"
+                      style={{
+                        width: "32px",
+                        height: "32px",
+                        objectFit: "cover",
+                        border: "1px solid #eee"
+                      }}
+                    />
+                  ) : (
+                    <span
+                      className="d-inline-flex align-items-center justify-content-center rounded-circle bg-light text-dark fw-bold"
+                      style={{
+                        width: "32px",
+                        height: "32px"
+                      }}
+                    >
+                      {(user?.name || "?").charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                </a>
+                <button 
+                  onClick={logout} 
+                  className="btn btn-danger"
+                >
+                  Salir
+                </button>
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </nav>
   );
 }
 
-const bar = { display:"flex", justifyContent:"space-between", alignItems:"center", padding:"12px 16px", borderBottom:"1px solid #eee", position:"sticky", top:0, background:"#fff", zIndex:50 };
-const brand = { fontWeight:800, textDecoration:"none", color:"#111", fontSize:18 };
-const link = { textDecoration:"none", color:"#333", padding:"6px 8px", borderRadius:8 };
-const btnPrimary = { textDecoration:"none", color:"white", background:"#2563eb", padding:"8px 12px", borderRadius:10 };
-const btnDanger = { color:"white", background:"#ef4444", padding:"8px 12px", border:"none", borderRadius:10, cursor:"pointer" };
+export default Navbar;

@@ -36,12 +36,7 @@ def register():
     db.session.add(user)
     db.session.commit()
 
-    access_token = create_access_token(identity=str(user.id))  
-    user_data = user.serialize()
-
     return jsonify({
-        "access_token": access_token,
-        "user": user_data,
         "msg": "Usuario creado correctamente"
     }), 201
 
@@ -57,10 +52,12 @@ def login():
     if not user or not check_password_hash(user.password_hash, password):
         raise APIException("Usuario no encontrado, registrate o inicia sesion con credenciales validas.", status_code=401)
     
-    access_token = create_access_token(identity=str(user.id))
+    user_serialize = user.serialize()
+    access_token = create_access_token(identity=str(user_serialize["id"]))
+
     return jsonify({
-        "access_token": access_token, 
-        "user": user.serialize()
+        "access_token": access_token,
+        "user": user_serialize
     }), 200
 
 @api.route('/users/me/<user_id>', methods=['GET'])
@@ -134,18 +131,21 @@ def create_event():
         print("Error parsing datetime:", e)
         raise APIException(
             "Formato de fecha/hora invalido (usa ISO 8601)", status_code=400)
+    image_url = data.get("image_url")
+    
     
     event = Event(
-         title=data["title"],  # Nuevo campo
+         title=data["title"],
         sport=data["sport"],
-        description=data.get("description"),  # Nuevo campo (opcional)
+        description=data.get("description"),  
         datetime=dt,
         address=data["address"],
         capacity=int(data["capacity"]),
         price=int(data["price"]),
         is_free=(int(data["price"]) == 0),
-        user_id=user_id
-        )
+        user_id=user_id,
+        image_url=image_url  
+    )
 
     db.session.add(event)
     db.session.commit()
@@ -177,66 +177,17 @@ def update_event(event_id):
 @api.route('/events/<int:event_id>', methods=['DELETE'])
 @jwt_required()
 def delete_event(event_id):
-    try:
-        print("=== DELETE DEBUG ===")
-        
-        # Debug del usuario actual
         current_user_id = get_jwt_identity()
-        print(f"🔑 JWT Identity: {current_user_id}")
-        print(f"🔑 Type of JWT Identity: {type(current_user_id)}")
-        
-        # Debug del usuario en la base de datos
         current_user = User.query.get(current_user_id)
-        print(f"🔑 User from DB: {current_user}")
-        print(f"🔑 User ID from DB: {current_user.id if current_user else 'None'}")
-        
-        # Debug del evento
         event = Event.query.get(event_id)
-        print(f"🔍 Event to delete: {event}")
-        print(f"🔍 Event user_id: {event.user_id if event else 'None'}")
         
         if not event:
             return jsonify({"msg": "Evento no encontrado"}), 404
         
-        # Verificación
-        print(f"🔍 Comparison: {event.user_id} == {current_user_id} -> {event.user_id == current_user_id}")
-        
-        if event.user_id != current_user_id:
+        if str(event.user_id) != str(current_user_id):
             return jsonify({"msg": "No autorizado"}), 403
         
         db.session.delete(event)
         db.session.commit()
         
         return jsonify({"msg": "Evento eliminado"}), 200
-        
-    except Exception as e:
-        print(f"❌ Error: {str(e)}")
-        db.session.rollback()
-        return jsonify({"msg": f"Error: {str(e)}"}), 500
-
-"""
-@api.route('/events/<int:event_id>/join', methods=['POST'])
-@jwt_required()
-def join_event(event_id):
-
-    user_id = get_jwt_identity()
-    event = Event.query.get(event_id)
-    if not event:
-        raise APIException("Evento no encontrado", status_code=404)
-    if len(event.players) >= event.capacity:
-        raise APIException("Evento lleno", status_code=400)
-    exist = EventPlayer.query.filter_by(
-        user_id=user_id, event_id=event_id).first()
-    if exist:
-        raise APIException("Ya inscrito en este evento", status_code=409)
-
-    inscription = EventPlayer(
-        user_id=user_id,
-        event_id=event_id,
-        paid=event.is_free
-    )
-    db.session.add(inscription)
-    db.session.commit()
-    return jsonify(inscription.serialize()), 201
-
-"""

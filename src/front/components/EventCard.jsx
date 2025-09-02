@@ -9,13 +9,16 @@ const sportImages = {
     "https://images.unsplash.com/photo-1546519638-68e109498ffc?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmFsb25jZXN0b3xlbnwwfHwwfHx8MA%3D%3D",
   pádel:
     "https://rekoveryclinic.com/wp-content/uploads/2023/06/jugadoras-de-padel-practicando-deporte.jpg",
-  Tenis:
+  tenis:
     "https://media.istockphoto.com/id/1455497361/es/foto/pareja-joven-en-cancha-de-tenis-hombre-guapo-y-mujer-atractiva-est%C3%A1n-jugando-al-tenis.jpg?s=612x612&w=0&k=20&c=pyiCggfukCyHPVjHq8Ab85pIHrSPqnnrgWVin4OsFwY=",
   voleibol:
     "https://media.istockphoto.com/id/485863392/es/foto/voleibol-de-playa-doble-en-la-red.jpg?s=612x612&w=0&k=20&c=kASUs8YfY3cz138qCcjfybQ-PDQ3JM2G1lb5VWKDtlo=",
   running:
     "https://media.istockphoto.com/id/612398606/es/foto/marat%C3%B3n-de-carrera-de-atletismo.jpg?s=612x612&w=0&k=20&c=xNejNoZ25NnqINi4T5qqv57BFaashjvF16j8m4-BTsY=",
 };
+const fallbackImage =
+  "https://img.freepik.com/foto-gratis/herramientas-deportivas_53876-138077.jpg";
+
 
 export default function EventCard({ event, onJoin, onDelete, isOwner }) {
   const navigate = useNavigate();
@@ -40,7 +43,7 @@ export default function EventCard({ event, onJoin, onDelete, isOwner }) {
   };
 
   const sportKey = (event?.sport || "").toLowerCase().trim();
-  const imgUrl = sportImages;
+  const imgUrl = event.image_url || sportImages[sportKey];
   
 
   const handleViewDetails = () => {

@@ -61,7 +61,7 @@ export function Navbar() {
         <div className="collapse navbar-collapse" id="navbarNav">
           <div className="navbar-nav me-auto"></div>
           
-          <div className="d-flex align-items-center gap-2">
+          <div className="d-flex align-items-center gap-5">
             {!isLogged ? (
               <>
                 <a className="nav-link" href="/register">
@@ -73,9 +73,7 @@ export function Navbar() {
               </>
             ) : (
               <>
-                <a className="nav-link" href="/">
-                  Inicio
-                </a>
+                
                 <a href="/profile" className="nav-link p-0">
                   {user?.avatar_url ? (
                     <img
@@ -83,8 +81,8 @@ export function Navbar() {
                       alt="avatar"
                       className="rounded-circle"
                       style={{
-                        width: "32px",
-                        height: "32px",
+                        width: "48px",
+                        height: "48px",
                         objectFit: "cover",
                         border: "1px solid #eee"
                       }}

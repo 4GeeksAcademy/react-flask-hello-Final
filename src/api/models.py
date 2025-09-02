@@ -28,6 +28,7 @@ class User(db.Model):
             "created_at": self.created_at.isoformat(),
             
         }
+
 class Event(db.Model):
     __tablename__ = "events"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -40,13 +41,17 @@ class Event(db.Model):
     price: Mapped[int] = mapped_column(Integer, default=0)
     is_free: Mapped[bool] = mapped_column(Boolean, default=True)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False)
-    
+    image_url: Mapped[str | None] = mapped_column(String(255), nullable=True)
+
+    def _default_image(self) -> str:
+        key = (self.sport or "").strip().lower()
+
     def serialize(self):
         return {
             "id": self.id,
-            "title": self.title,  # Incluir en serialización
+            "title": self.title,
             "sport": self.sport,
-            "description": self.description,  # Incluir en serialización
+            "description": self.description, 
             "datetime": self.datetime.isoformat(),
             "address": self.address, 
             "capacity": self.capacity,
@@ -54,25 +59,3 @@ class Event(db.Model):
             "is_free": self.is_free,
             "user_id": self.user_id,
         }
-"""
-class EventPlayer(db.Model):
-    __tablename__= "event_players"
-    
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] =mapped_column(Integer, ForeignKey("users.id"), nullable=False)
-    event_id: Mapped[int] =mapped_column(Integer, ForeignKey("events.id"), nullable=False)
-    paid: Mapped[bool] =mapped_column(Boolean, default=False)
-    material: Mapped[str | None] = mapped_column(String(200), nullable=True)
-    created_at: Mapped[datetime] =mapped_column(DateTime, default=datetime.utcnow)
-    user: Mapped["User"] = relationship("User", back_populates="registrations")
-    event: Mapped["Event"] = relationship("Event", back_populates="players")
-    def serialize(self):
-        return {
-            "id":self.id,
-            "user_id":self.user_id,
-            "event_id":self.event_id,
-            "paid":self.paid,
-            "material":self.material,
-            "created_at": self.created_at.isoformat(),
-        }
-        """

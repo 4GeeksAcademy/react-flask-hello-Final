@@ -123,7 +123,7 @@ export default function EventNew() {
               </select>
             </div>
 
-            {/* FECHA y HORA en la misma línea */}
+            {/* FECHA y HORA*/}
             <div className="row">
               <div className="col-md-6 mb-3">
                 <label className="form-label">Fecha</label>
@@ -150,7 +150,7 @@ export default function EventNew() {
               </div>
             </div>
 
-            {/* CAPACIDAD y PRECIO en la misma línea */}
+            {/* CAPACIDAD y PRECIO*/}
             <div className="row">
               <div className="col-md-6 mb-3">
                 <label className="form-label">Número de jugadores</label>
@@ -185,7 +185,7 @@ export default function EventNew() {
               </div>
             </div>
 
-            {/* UBICACIÓN - Individual */}
+            {/* UBICACIÓN */}
             <div className="mb-4">
               <label className="form-label fw-bold">Ubicación</label>
               
@@ -254,7 +254,7 @@ export default function EventNew() {
               )}
             </div>
 
-            {/* DESCRIPCIÓN - Individual */}
+            {/* DESCRIPCIÓN */}
             <div className="mb-3">
               <label className="form-label">Descripción</label>
               <textarea
@@ -267,7 +267,7 @@ export default function EventNew() {
               />
             </div>
 
-            {/* BOTÓN - Individual */}
+            {/* BOTÓN */}
             <button 
               type="submit" 
               className="btn btn-primary btn-lg"

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
-// 🖼️ Diccionario de imágenes (igual que en EventCard)
+
 const sportImages = {
   futbol:
     "https://static.vecteezy.com/system/resources/previews/027/829/024/non_2x/close-up-of-many-soccer-players-kicking-a-football-on-a-field-competition-scene-created-with-generative-ai-technology-photo.jpg",
@@ -9,13 +9,14 @@ const sportImages = {
     "https://images.unsplash.com/photo-1546519638-68e109498ffc?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmFsb25jZXN0b3xlbnwwfHwwfHx8MA%3D%3D",
   pádel:
     "https://rekoveryclinic.com/wp-content/uploads/2023/06/jugadoras-de-padel-practicando-deporte.jpg",
-  Tenis:
+  tenis:
     "https://media.istockphoto.com/id/1455497361/es/foto/pareja-joven-en-cancha-de-tenis-hombre-guapo-y-mujer-atractiva-est%C3%A1n-jugando-al-tenis.jpg?s=612x612&w=0&k=20&c=pyiCggfukCyHPVjHq8Ab85pIHrSPqnnrgWVin4OsFwY=",
   voleibol:
     "https://media.istockphoto.com/id/485863392/es/foto/voleibol-de-playa-doble-en-la-red.jpg?s=612x612&w=0&k=20&c=kASUs8YfY3cz138qCcjfybQ-PDQ3JM2G1lb5VWKDtlo=",
   running:
     "https://media.istockphoto.com/id/612398606/es/foto/marat%C3%B3n-de-carrera-de-atletismo.jpg?s=612x612&w=0&k=20&c=xNejNoZ25NnqINi4T5qqv57BFaashjvF16j8m4-BTsY=",
 };
+
 
 export default function EventDetail() {
   const { id } = useParams();
@@ -122,12 +123,8 @@ export default function EventDetail() {
 
   
   const sportKey = (event?.sport || "").toLowerCase().trim();
-  const imgUrl = sportImages[sportKey];
+  const imgUrl = event.image_url || sportImages[sportKey];
   const isOwner = currentUser?.id === event.user_id;
-
-  console.log("DEBUG - User ID:", currentUser?.id);
-  console.log("DEBUG - Event Creator ID:", event.user_id);
-  console.log("DEBUG - Is Owner:", isOwner);
 
   return (
     <div style={{ padding: 16, maxWidth: 600, margin: "0 auto" }}>
@@ -154,11 +151,6 @@ export default function EventDetail() {
           <p style={muted}>📅 Fecha: {dateLabel}</p>
           <p style={muted}>👥 Capacidad: {event.capacity} jugadores</p>
           <p style={muted}>📍 Ubicación: ({event.address})</p>
-
-           <p style={{ fontSize: 12, color: '#888', marginTop: 10 }}>
-            Debug: User {currentUser?.id} vs Event {event.user_id} | Owner: {isOwner ? 'SÍ' : 'NO'}
-          </p>
-
         </div>
 
         {/*BOTÓN DE ELIMINAR */}

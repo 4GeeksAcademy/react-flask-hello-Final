@@ -41,7 +41,7 @@ function HomePublica() {
 
  return (
     <div className="container-fluid p-0 vh-100 d-flex">
-      {/* Columna de información (50% del ancho) */}
+      {/* Columna de información */}
       <div className="col-md-6 d-flex align-items-center bg-light overflow-auto py-4">
         <div className="p-4 p-lg-5 w-100" style={{maxHeight: '100vh'}}>
           {/* Título y subtítulo */}
@@ -76,7 +76,7 @@ function HomePublica() {
             </div>
           </div>
 
-          {/* Características en grid compacto */}
+          {/* Características */}
           <div className="row g-2 mb-4 mx-auto" style={{maxWidth: '60%'}}>
             <div className="col-6">
               <div className="p-2">
@@ -151,7 +151,7 @@ function HomePublica() {
         </div>
       </div>
 
-      {/* Columna del carrusel (50% del ancho) */}
+      {/* Columna del carrusel */}
       <div className="col-md-6 p-0 d-none d-md-block">
         <div id="sportCarousel" className="carousel slide h-100" data-bs-ride="carousel">
           <div className="carousel-indicators">

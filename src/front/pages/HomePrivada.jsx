@@ -55,20 +55,15 @@ export default function HomePrivada() {
   }
 
   async function handleDelete(eventId) {
-  console.log("=== DEBUG ELIMINAR ===");
-  console.log("Token existe:", !!token);
-  console.log("User ID from token:", currentUser?.id);
-  
-  // Encuentra el evento para ver su user_id
   const eventToDelete = events.find(ev => ev.id === eventId);
-  console.log("Evento a eliminar:", eventToDelete);
-  console.log("Event user_id:", eventToDelete?.user_id);
-  console.log("¿Es el owner?", currentUser?.id === eventToDelete?.user_id);
-  
+
   if (!token) {
     alert("Debes iniciar sesión para eliminar eventos.");
     return;
   }
+  if (!confirm("¿Estás seguro de que quieres eliminar este evento? Esta acción no se puede deshacer.")) {
+      return;
+    }
 
   try {
     console.log("Enviando DELETE request...");

@@ -97,7 +97,12 @@ def delete_account():
     user = User.query.get(user_id)
     if not user:
         raise APIException("Usuario no encontrado", status_code=404)
-    
+    try:
+        Event.query.filter_by(user_id=user_id).delete(synchronize_session=False)
+    except Exception as e:
+        db.session.rollback()
+        raise APIException("Error al eliminar eventos", status_code=500)
+
     db.session.delete(user)
     db.session.commit()
     return jsonify({"msg":  "Cuenta eliminada"}), 200

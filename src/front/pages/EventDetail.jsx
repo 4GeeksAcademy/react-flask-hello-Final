@@ -90,21 +90,20 @@ export default function EventDetail() {
   }
 
   async function handleDelete() {
+    const token = localStorage.getItem("pick4fun_token");
     if (!token) {
       alert("Debes iniciar sesión para eliminar eventos.");
       return;
     }
-
-    if (!confirm("¿Estás seguro de que quieres eliminar este evento? Esta acción no se puede deshacer.")) {
+    if (!confirm("¿Estás seguro de que quieres eliminar el evento? Esta acción no se puede deshacer.")) {
       return;
     }
+
 
     try {
       const res = await fetch(`${BASE}/api/events/${id}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       
       const data = await res.json().catch(() => ({}));

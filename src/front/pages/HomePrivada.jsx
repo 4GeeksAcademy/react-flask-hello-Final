@@ -227,14 +227,13 @@ headerText: {
   textAlign: 'left',
 },
 logo: {
-  marginTop: '5px', // Ajuste para alinear mejor con el texto
+  marginTop: '5px',
+   marginBottom: '15px',
 },
   headerContent: {
     textAlign: 'left',
   },
-  logo: {
-    marginBottom: '15px',
-  },
+
   logoIcon: {
     fontSize: '50px',
     background: 'linear-gradient(135deg, #ff6b6b, #4ecdc4)',

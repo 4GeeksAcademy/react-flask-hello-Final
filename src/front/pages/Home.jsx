@@ -65,6 +65,23 @@ export default function Home() {
 function HomePublica() {
   const [activeIndex, setActiveIndex] = useState(0);
 
+  const totalSlides = sportGallery.length;
+
+  const next = React.useCallback(
+    () => setActiveIndex((i) => (i + 1) % totalSlides),
+    [totalSlides]
+  );
+
+  const prev = React.useCallback(
+    () => setActiveIndex((i) => (i - 1 + totalSlides) % totalSlides),
+    [totalSlides]
+  );
+
+  useEffect(() => {
+  const id = setInterval(next, 5000);
+  return () => clearInterval(id);
+  }, [next]);
+
   return (
     <div style={styles.container}>
       {/* Fondo animado */}
@@ -203,21 +220,19 @@ function HomePublica() {
                     alt={sport.label}
                     style={styles.carouselImage}
                   />
+                  <button
+                    area-label="Anterior"
+                    onClick={prev}
+                    style={styles.navAreaLeft}
+                  />
+                  <button
+                    area-label="Siguiente"
+                    onClick={next}
+                    style={styles.navAreaRight}
+                  />
                   <div style={styles.carouselOverlay}>
-                    <h3 style={styles.carouselTitle}>{sport.label}</h3>
-                    <div style={styles.carouselIndicators}>
-                      {sportGallery.map((_, i) => (
-                        <button
-                          key={i}
-                          style={{
-                            ...styles.indicator,
-                            background: i === activeIndex ? '#fff' : 'rgba(255,255,255,0.3)'
-                          }}
-                          onClick={() => setActiveIndex(i)}
-                        />
-                      ))}
-                    </div>
-                  </div>
+                  <h3 style={styles.carouselTitle}>{sport.label}</h3>
+                </div>
                 </div>
               ))}
             </div>
@@ -558,6 +573,28 @@ const styles = {
     opacity: 0.25,
     animation: 'floatElement 10s ease-in-out infinite',
   },
+
+  navAreaLeft: {
+  position: 'absolute',
+  left: 0,
+  top: 0,
+  bottom: 0,
+  width: '35%',          
+  background: 'transparent',
+  border: 'none',
+  cursor: 'pointer',
+},
+
+navAreaRight: {
+  position: 'absolute',
+  right: 0,
+  top: 0,
+  bottom: 0,
+  width: '35%',
+  background: 'transparent',
+  border: 'none',
+  cursor: 'pointer',
+},
 };
 
 // Asegurar que las animaciones estén definidas

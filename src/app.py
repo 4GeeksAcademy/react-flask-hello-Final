@@ -6,10 +6,6 @@ import os
 
 load_dotenv()
 
-print("✅ FLASK_APP_KEY:", os.getenv("FLASK_APP_KEY"))
-print("✅ DATABASE_URL:", os.getenv("DATABASE_URL"))
-print("✅ DEBUG:", os.getenv("DEBUG"))
-
 from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger

@@ -1,4 +1,3 @@
-# render.yaml
 services:
   - type: web
     name: sample-service-name
@@ -7,14 +6,12 @@ services:
     plan: free
     numInstances: 1
 
-    # Construye backend + frontend sin pipenv
     buildCommand: |
       pip install -r requirements.txt
-      npm --prefix front ci
-      npm --prefix front run build
-      rm -rf src/dist && cp -r front/dist src/dist
+      npm ci
+      npm run build
+      rm -rf src/dist && cp -r dist src/dist
 
-    # Asegura que Python pueda importar "api" desde src/
     startCommand: "PYTHONPATH=./src gunicorn -b 0.0.0.0:$PORT src.app:app"
 
     envVars:
@@ -22,17 +19,9 @@ services:
         value: "20"
       - key: FLASK_APP_KEY
         value: "any key works"
-      - key: TOKEN_KEY
-        value: "secretkey"
       - key: FLASK_DEBUG
         value: "0"
       - key: DATABASE_URL
         fromDatabase:
           name: postgresql-trapezoidal-42170
           property: connectionString
-
-databases:
-  - name: postgresql-trapezoidal-42170
-    region: ohio
-    ipAllowList: []
-    plan: free

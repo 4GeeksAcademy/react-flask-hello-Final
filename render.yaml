@@ -10,6 +10,7 @@ services:
       pip install -r requirements.txt
       npm ci
       npm run build
+      rm -rf src/dist && cp -r dist src/dist
 
     startCommand: "PYTHONPATH=./src gunicorn -b 0.0.0.0:$PORT src.app:app"
 

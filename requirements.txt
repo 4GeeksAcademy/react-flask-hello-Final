@@ -20,3 +20,4 @@ gunicorn==21.2.0
 
 # Mantén flask-swagger si tu código lo usa:
 flask-swagger==0.2.14
+Flask-JWT-Extended==4.6.0

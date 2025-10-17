@@ -1,7 +1,15 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
+from dotenv import load_dotenv
 import os
+
+load_dotenv()
+
+print("✅ FLASK_APP_KEY:", os.getenv("FLASK_APP_KEY"))
+print("✅ DATABASE_URL:", os.getenv("DATABASE_URL"))
+print("✅ DEBUG:", os.getenv("DEBUG"))
+
 from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
@@ -23,11 +31,18 @@ app.url_map.strict_slashes = False
 
 # database condiguration
 db_url = os.getenv("DATABASE_URL")
-if db_url is not None:
-    app.config['SQLALCHEMY_DATABASE_URI'] = db_url.replace(
-        "postgres://", "postgresql://")
+
+if db_url:
+    # 1) Arregla URLs antiguas de Heroku: postgres:// → postgresql://
+    if db_url.startswith("postgres://"):
+        db_url = db_url.replace("postgres://", "postgresql://", 1)
+    # 2) Fuerza el driver psycopg3 para SQLAlchemy: postgresql:// → postgresql+psycopg://
+    if db_url.startswith("postgresql://"):
+        db_url = db_url.replace("postgresql://", "postgresql+psycopg://", 1)
+
+    app.config["SQLALCHEMY_DATABASE_URI"] = db_url
 else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:////tmp/test.db"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:////tmp/test.db"
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config["JWT_SECRET_KEY"] = os.getenv("TOKEN_KEY")

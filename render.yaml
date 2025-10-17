@@ -8,10 +8,9 @@ services:
 
     buildCommand: |
       pip install -r requirements.txt
-      npm ci
-      npm run build
-      rm -rf src/dist && cp -r dist src/dist
-
+      npm --prefix front ci
+      npm --prefix front run build
+      rm -rf src/dist && cp -r front/dist src/dist
     startCommand: "PYTHONPATH=./src gunicorn -b 0.0.0.0:$PORT src.app:app"
 
     envVars:

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import HomePrivada from "./HomePrivada";
+import { Link } from "react-router-dom";
 
 const sportGallery = [
   { 
@@ -196,9 +197,9 @@ function HomePublica() {
 
             {/* CTA */}
             <div style={styles.ctaContainer}>
-              <a href="/register" style={styles.ctaButton}>
+              <Link to="/register" style={styles.ctaButton}>
                 🚀 COMENZAR AVENTURA
-              </a>
+              </Link>
             </div>
           </div>
 
